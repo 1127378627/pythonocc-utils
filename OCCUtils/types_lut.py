@@ -15,11 +15,29 @@
 ##You should have received a copy of the GNU Lesser General Public License
 ##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>
 
-from OCC.BRepCheck import *
-from OCC.GeomAbs import *
+from OCC.BRepCheck import BRepCheck_NoError, BRepCheck_InvalidPointOnCurveOnSurface, BRepCheck_InvalidPointOnSurface, \
+    BRepCheck_No3DCurve, BRepCheck_Multiple3DCurve, BRepCheck_Invalid3DCurve, BRepCheck_NoCurveOnSurface, \
+    BRepCheck_InvalidCurveOnSurface, BRepCheck_InvalidCurveOnClosedSurface, BRepCheck_InvalidSameRangeFlag, \
+    BRepCheck_InvalidSameParameterFlag, BRepCheck_InvalidDegeneratedFlag, BRepCheck_FreeEdge, \
+    BRepCheck_InvalidMultiConnexity, BRepCheck_InvalidRange, BRepCheck_EmptyWire, BRepCheck_RedundantEdge, \
+    BRepCheck_NoSurface, BRepCheck_InvalidWire, BRepCheck_RedundantWire, BRepCheck_IntersectingWires, \
+    BRepCheck_InvalidImbricationOfWires, BRepCheck_EmptyShell, BRepCheck_RedundantFace, BRepCheck_UnorientableShape, \
+    BRepCheck_NotClosed, BRepCheck_NotConnected, BRepCheck_SubshapeNotInShape, BRepCheck_BadOrientation, \
+    BRepCheck_BadOrientationOfSubshape, BRepCheck_InvalidToleranceValue, BRepCheck_CheckFail, \
+    BRepCheck_SelfIntersectingWire, BRepCheck_InvalidPointOnCurve
+
+from OCC.GeomAbs import GeomAbs_Line, GeomAbs_Circle, GeomAbs_Ellipse, GeomAbs_Hyperbola, GeomAbs_Parabola, \
+    GeomAbs_BezierCurve, GeomAbs_BSplineCurve, GeomAbs_OtherCurve, GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, \
+    GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, GeomAbs_BSplineSurface, GeomAbs_SurfaceOfRevolution, \
+    GeomAbs_SurfaceOfExtrusion, GeomAbs_OffsetSurface, GeomAbs_OtherSurface
+
+from OCC.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_WIRE, TopAbs_SHELL, TopAbs_SOLID, \
+    TopAbs_COMPOUND, TopAbs_COMPSOLID, TopAbs_IN, TopAbs_OUT, TopAbs_ON, TopAbs_UNKNOWN, TopAbs_FORWARD, \
+    TopAbs_REVERSED, \
+    TopAbs_INTERNAL, TopAbs_EXTERNAL, TopAbs_SHAPE
+
 from OCC.TopoDS import topods, TopoDS_Shape
 from OCC.BRep import BRep_Tool_Surface
-from OCC.TopAbs import *
 from OCC.Geom import Handle_Geom_CylindricalSurface, Handle_Geom_Plane
 
 
@@ -27,16 +45,17 @@ class ShapeToTopology(object):
     '''
     looks up the topology type and returns the corresponding topological entity
     '''
+
     def __init__(self):
         self.tds = topods()
-        self.topoTypes = {TopAbs_VERTEX:      self.tds.Vertex,
-                          TopAbs_EDGE:        self.tds.Edge,
-                          TopAbs_FACE:        self.tds.Face,
-                          TopAbs_WIRE:        self.tds.Wire,
-                          TopAbs_SHELL:       self.tds.Shell,
-                          TopAbs_SOLID:       self.tds.Solid,
-                          TopAbs_COMPOUND:    self.tds.Compound,
-                          TopAbs_COMPSOLID:   self.tds.CompSolid,
+        self.topoTypes = {TopAbs_VERTEX: self.tds.Vertex,
+                          TopAbs_EDGE: self.tds.Edge,
+                          TopAbs_FACE: self.tds.Face,
+                          TopAbs_WIRE: self.tds.Wire,
+                          TopAbs_SHELL: self.tds.Shell,
+                          TopAbs_SOLID: self.tds.Solid,
+                          TopAbs_COMPOUND: self.tds.Compound,
+                          TopAbs_COMPSOLID: self.tds.CompSolid,
                           }
 
     def __call__(self, shape):
@@ -53,6 +72,7 @@ class EnumLookup(object):
     """
     perform bi-directional lookup of Enums'...
     """
+
     def __init__(self, li_in, li_out):
         self.d = {}
         for a, b in zip(li_in, li_out):
@@ -76,23 +96,19 @@ _surface_typesA = (GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone,
 _surface_typesB = ('plane', 'cylinder', 'cone', 'sphere', 'torus', 'bezier',
                    'spline', 'revolution', 'extrusion', 'offset', 'other')
 
-
 _stateA = ('in', 'out', 'on', 'unknown')
 _stateB = (TopAbs_IN, TopAbs_OUT, TopAbs_ON, TopAbs_UNKNOWN)
-
 
 _orientA = ['TopAbs_FORWARD', 'TopAbs_REVERSED', 'TopAbs_INTERNAL',
             'TopAbs_EXTERNAL']
 _orientB = [TopAbs_FORWARD, TopAbs_REVERSED, TopAbs_INTERNAL,
             TopAbs_EXTERNAL]
 
-
 _topoTypesA = ['vertex', 'edge', 'wire', 'face', 'shell',
                'solid', 'compsolid', 'compound', 'shape']
 _topoTypesB = [TopAbs_VERTEX, TopAbs_EDGE, TopAbs_WIRE, TopAbs_FACE,
                TopAbs_SHELL, TopAbs_SOLID,
                TopAbs_COMPSOLID, TopAbs_COMPOUND, TopAbs_SHAPE]
-
 
 _geom_types_a = ['line', 'circle', 'ellipse', 'hyperbola', 'parabola',
                  'beziercurve', 'bsplinecurve', 'othercurve']
@@ -106,6 +122,7 @@ _geom_types_b = [GeomAbs_Line, GeomAbs_Circle, GeomAbs_Ellipse,
 
 def fix_formatting(_str):
     return [i.strip() for i in _str.decode('string_escape').split(',')]
+
 
 _brep_check_a = fix_formatting("NoError, InvalidPointOnCurve,\
 InvalidPointOnCurveOnSurface, InvalidPointOnSurface,\
@@ -167,7 +184,7 @@ for elem in classes:
 def what_is_face(face):
     ''' Returns all class names for which this class can be downcasted
     '''
-    if not face.ShapeType()==TopAbs_FACE:
+    if not face.ShapeType() == TopAbs_FACE:
         print '%s is not a TopAbs_FACE. Conversion impossible'
         return None
     hs = BRep_Tool_Surface(face)
