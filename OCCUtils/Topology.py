@@ -27,13 +27,15 @@ History:
         23-04-2009:    fixed a reference issue ( fixed using ReInit )
 '''
 from __future__ import print_function
-
-from OCC.TopAbs import *
-from OCC.TopExp import *
-from OCC.TopoDS import *
-from OCC.TopTools import *
-from OCC.BRepTools import *
-from OCC.BRep import *
+from OCC.BRep import BRep_Tool
+from OCC.BRepTools import BRepTools_WireExplorer
+from OCC.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_WIRE, TopAbs_SHELL, TopAbs_SOLID, TopAbs_COMPOUND, \
+    TopAbs_COMPSOLID
+from OCC.TopExp import TopExp_Explorer, topexp_MapShapesAndAncestors
+from OCC.TopTools import TopTools_ListOfShape, TopTools_IndexedDataMapOfShapeListOfShape
+from OCC.TopTools import TopTools_ListIteratorOfListOfShape
+from OCC.TopoDS import TopoDS_Wire, topods_Edge, topods_Vertex, topods_Face, topods_Wire, topods_Shell, topods_Solid, \
+    topods_Compound, topods_CompSolid, TopoDS_Iterator
 
 __all__ = ['Topo', 'WireExplorer']
 
@@ -392,7 +394,7 @@ def dumpTopology(shape, level=0):
     """
      Print the details of an object from the top down
     """
-    brt = BRep_Tool()
+    brt = BRep_Tool
     s = shape.ShapeType()
     print("." * level, end="")
     print(shapeTypeString(shape), end="")

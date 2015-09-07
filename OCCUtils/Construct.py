@@ -40,12 +40,11 @@ from OCC.TColgp import TColgp_SequenceOfVec, TColgp_HArray1OfPnt
 from OCC.TopAbs import TopAbs_REVERSED
 from OCC.TopoDS import TopoDS_Wire, TopoDS_Shape, TopoDS_Builder, TopoDS_Compound
 from OCC.TopoDS import TopoDS_Vertex
-from OCC.gp import gp_Vec, gp_Dir, gp_Ax1, gp_Trsf, gp_Quaternion, gp_Circ, gp_Pln
-from OCC.gp import gp_Pnt
 
-from Context import assert_isdone
+from OCCUtils.Common import gp_Vec, gp_Dir, gp_Ax1, gp_Trsf, gp_Quaternion, gp_Circ, gp_Pln, gp_Pnt
+from OCCUtils.Context import assert_isdone
+from OCCUtils.types_lut import ShapeToTopology
 from OCCUtils.Common import to_adaptor_3d, project_point_on_curve, vertex2pnt, to_tcol_, points_to_bspline
-from types_lut import ShapeToTopology
 
 import operator
 import math

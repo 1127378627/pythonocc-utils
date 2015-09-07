@@ -18,27 +18,31 @@
 ##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
+from OCC.BRepAdaptor import BRepAdaptor_Curve, BRepAdaptor_CompCurve, BRepAdaptor_HCompCurve, BRepAdaptor_HCurve
+from OCC.BRepBndLib import brepbndlib_Add
+from OCC.BRepBuilderAPI import BRepBuilderAPI_Transform
 
-from OCC.Bnd import *
-from OCC.BRepBndLib import *
-from OCC.TColgp import *
-from OCC.TColStd import *
-from OCC.BRepAdaptor import *
-from OCC.GeomAPI import *
-from OCC.gp import *
-from OCC.BRepBuilderAPI import *
-from OCC.TopoDS import *
-from OCC.Quantity import *
-from OCC.GProp import GProp_GProps
-from OCC.GeomAbs import *
 from OCC.BRepGProp import brepgprop_LinearProperties, brepgprop_SurfaceProperties, brepgprop_VolumeProperties
 from OCC import Graphic3d
+from OCC.Bnd import Bnd_Box
+from OCC.GProp import GProp_GProps
+from OCC.GeomAPI import GeomAPI_PointsToBSpline, GeomAPI_Interpolate
+from OCC.GeomAbs import GeomAbs_C2
+from OCC.Quantity import Quantity_Color, Quantity_TOC_RGB
+from OCC.TColStd import TColStd_HArray1OfBoolean
+from OCC.TColgp import TColgp_Array1OfPnt, TColgp_HArray1OfPnt, TColgp_Array1OfVec
+from OCC.TColgp import TColgp_Array1OfPnt2d
+from OCC.TopoDS import TopoDS_Vertex, TopoDS_Wire, TopoDS_Edge, TopoDS_Shape
+# wildcard import, since other OCCUtils libs rely on all gp' entities being imported
+from OCC.gp import *
 
-from Context import assert_isdone
+from OCCUtils.Context import assert_isdone
 
 #===========================================================================
 # No PythonOCC dependencies...
 #===========================================================================
+from OCCUtils.types_lut import ShapeToTopology
+
 
 def roundlist(li, n_decimals=3):
     return [round(i, n_decimals) for i in li]
@@ -419,7 +423,8 @@ def fix_continuity(edge, continuity=1):
     su = ShapeUpgrade_ShapeDivideContinuity(edge)
     su.SetBoundaryCriterion(eval('GeomAbs_C'+str(continuity)))
     su.Perform()
-    te = st(su.Result())
+    stt= ShapeToTopology()
+    te = stt(su.Result())
     return te
 
 

@@ -17,9 +17,9 @@
 
 from OCC.TopoDS import TopoDS_Solid
 
-from Topology import Topo
-from base import GlobalProperties, KbeObject
-from shell import Shell
+from OCCUtils.Topology import Topo
+from OCCUtils.base import GlobalProperties, KbeObject
+from OCCUtils.shell import Shell
 
 
 class Solid(KbeObject, TopoDS_Solid):

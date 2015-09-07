@@ -16,7 +16,7 @@
 ##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>
 
 from OCC.Geom import Geom_Plane
-from OCC.gp import gp_Pln
+from OCCUtils.Common import gp_Pln
 
 
 class Plane(object):  # HalfSpace

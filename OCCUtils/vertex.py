@@ -15,13 +15,12 @@
 ##You should have received a copy of the GNU Lesser General Public License
 ##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>
 
-from OCC.gp import gp_Pnt, gp_Vec, gp_Dir, gp_XYZ, gp_Pnt2d
 from OCC.TopoDS import TopoDS_Vertex
 from OCC.ShapeBuild import ShapeBuild_ReShape
 
-from base import KbeObject
-from Construct import make_vertex
-from Common import vertex2pnt
+from OCCUtils.base import KbeObject
+from OCCUtils.Construct import make_vertex
+from OCCUtils.Common import vertex2pnt, gp_Pnt, gp_Vec, gp_Dir, gp_XYZ, gp_Pnt2d
 
 
 class Vertex(KbeObject, TopoDS_Vertex):

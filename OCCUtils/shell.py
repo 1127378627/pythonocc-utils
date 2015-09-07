@@ -17,8 +17,8 @@
 
 from OCC.TopoDS import TopoDS_Shell
 
-from Topology import Topo
-from base import KbeObject, GlobalProperties
+from OCCUtils.Topology import Topo
+from OCCUtils.base import KbeObject, GlobalProperties
 
 
 class DressUp(object):

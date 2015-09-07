@@ -27,14 +27,13 @@ from OCC.GeomLib import geomlib
 from OCC.GCPnts import GCPnts_AbscissaPoint
 from OCC.GeomAPI import GeomAPI_ProjectPointOnCurve
 from OCC.ShapeAnalysis import ShapeAnalysis_Edge
-from OCC.gp import gp_Pnt, gp_Dir, gp_Vec
 
 # high-level
-from Common import vertex2pnt, minimum_distance
-from Construct import make_edge, fix_continuity
-from Context import assert_isdone
-from types_lut import geom_lut
-from base import KbeObject
+from OCCUtils.Common import gp_Pnt, gp_Dir, gp_Vec, vertex2pnt, minimum_distance
+from OCCUtils.Construct import make_edge
+from OCCUtils.Context import assert_isdone
+from OCCUtils.types_lut import geom_lut
+from OCCUtils.base import KbeObject
 
 
 class IntersectCurve(object):

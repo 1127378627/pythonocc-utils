@@ -1,3 +1,3 @@
-from Common import get_boundingbox
-from Topology import Topo
-from Decorators import Downcast
+from OCCUtils.Common import get_boundingbox
+from OCCUtils.Topology import Topo
+from OCCUtils.Decorators import Downcast

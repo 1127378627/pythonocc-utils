@@ -30,13 +30,12 @@ from OCC.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.GeomProjLib import geomprojlib
 from OCC.Adaptor3d import Adaptor3d_IsoCurve
 from OCC.TopoDS import TopoDS_Face, TopoDS_Vertex, TopoDS_Edge
-from OCC.gp import gp_Dir, gp_Pnt2d
-from OCCUtils.Common import to_adaptor_3d
-from OCCUtils.Construct import TOLERANCE
 
-from base import KbeObject
-from edge import Edge
-from Topology import Topo, WireExplorer
+from OCCUtils.Common import to_adaptor_3d, gp_Dir, gp_Pnt2d
+from OCCUtils.Construct import TOLERANCE
+from OCCUtils.base import KbeObject
+from OCCUtils.edge import Edge
+from OCCUtils.Topology import Topo, WireExplorer
 
 '''
 

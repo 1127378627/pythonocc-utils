@@ -44,10 +44,11 @@ from OCC.BRepGProp import brepgprop_SurfaceProperties, brepgprop_VolumePropertie
 from OCC.GProp import GProp_GProps
 # occ high level
 from OCC.Display.SimpleGui import init_display
+
 # KBE
 from OCCUtils.Common import minimum_distance, get_boundingbox
 from OCCUtils.Construct import TOLERANCE, make_vertex
-from types_lut import shape_lut, topo_lut, curve_lut, surface_lut
+from OCCUtils.types_lut import shape_lut, topo_lut, curve_lut, surface_lut
 # stdlib
 import functools
 

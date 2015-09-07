@@ -14,8 +14,8 @@
 ##
 ##You should have received a copy of the GNU Lesser General Public License
 ##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>.
-
-from OCC.BRepAdaptor import *
+from OCC.BRepAdaptor import BRepAdaptor_Curve
+from OCC.BRepAdaptor import BRepAdaptor_HCurve
 
 
 def adapt_edge_to_curve(edg):
