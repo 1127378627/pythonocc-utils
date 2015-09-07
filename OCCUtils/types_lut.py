@@ -47,7 +47,7 @@ class ShapeToTopology(object):
     '''
 
     def __init__(self):
-        self.tds = topods()
+        self.tds = topods
         self.topoTypes = {TopAbs_VERTEX: self.tds.Vertex,
                           TopAbs_EDGE: self.tds.Edge,
                           TopAbs_FACE: self.tds.Face,

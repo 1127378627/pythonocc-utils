@@ -23,7 +23,7 @@ import sys
 sys.path.append('../OCCUtils')
 
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox
-from OCC.TopoDS import TopoDS_Face
+from OCC.TopoDS import TopoDS_Face, TopoDS_Shape, TopoDS_Solid
 
 from Topology import Topo
 
@@ -59,10 +59,62 @@ class TestTopo(unittest.TestCase):
         assert(t.number_of_compounds() == 0)
         assert(t.number_of_comp_solids() == 0)
 
+# TODO: port the huge list of tests from the ancient pythonocc repo...
+
+
+class Test_TypesLut(unittest.TestCase):
+    def test_shape_to_topology(self):
+        """
+
+        ShapeToTopology returns a specific topological type from a generic TopoDS_Shape
+
+        Many functions return a generic TopoDS_Shape, rather than a specific topological entity
+
+        `get_test_box_shape` is a good example, it returns a `TopoDS_Shape` rather than a TopoDS_Solid
+
+
+        Example
+        -------
+
+        # assume edg -> TopoDS_Edge
+
+        # >>> print shape
+        #  < OCC.TopoDS.TopoDS_Shape; proxy of <Swig... >
+        #
+        # >>> stt = types_lut.ShapeToTopology()
+        # >>> edge = stt(shape)
+        #  <OCC.TopoDS.TopoDS_Edge; proxy of <Swig... >
+
+        """
+
+        from OCCUtils import types_lut
+        box = get_test_box_shape()
+        tp = Topo(box)
+
+        stt = types_lut.ShapeToTopology()
+        assert isinstance(stt(TopoDS_Shape(box)), TopoDS_Solid)
+
+        for i in tp.vertices():
+            assert stt(TopoDS_Shape(i)) == i
+
+        for i in tp.edges():
+            assert stt(TopoDS_Shape(i)) == i
+
+        for i in tp.faces():
+            assert stt(TopoDS_Shape(i)) == i
+
+        for i in tp.wires():
+            assert stt(TopoDS_Shape(i)) == i
+
+        for i in tp.shells():
+            assert stt(TopoDS_Shape(i)) == i
+
+
 
 def suite():
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(TestTopo))
+    test_suite.addTest(unittest.makeSuite(Test_TypesLut))
     return test_suite
 
 if __name__ == "__main__":
