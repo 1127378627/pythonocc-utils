@@ -38,20 +38,23 @@ Can be a module, class or namespace.
 '''
 # occ
 from OCC.BRepBuilderAPI import BRepBuilderAPI_Copy
-from OCC.BRepGProp import brepgprop_VolumeProperties, brepgprop_LinearProperties, brepgprop_SurfaceProperties
-from OCC.BRepCheck import *
+from OCC.BRepCheck import BRepCheck_Vertex, BRepCheck_Edge, BRepCheck_Wire, BRepCheck_Face, BRepCheck_Shell, \
+    BRepCheck_Analyzer
+from OCC.BRepGProp import brepgprop_SurfaceProperties, brepgprop_VolumeProperties, brepgprop_LinearProperties
+from OCC.GProp import GProp_GProps
 # occ high level
 from OCC.Display.SimpleGui import init_display
-from Construct import *
 # KBE
-from types_lut import shape_lut, topo_lut, orient_lut, state_lut, curve_lut, surface_lut
+from OCCUtils.Common import minimum_distance, get_boundingbox
+from OCCUtils.Construct import TOLERANCE, make_vertex
+from types_lut import shape_lut, topo_lut, curve_lut, surface_lut
 # stdlib
 import functools
 
 
-#===========================================================================
+# ===========================================================================
 # DISPLAY
-#===========================================================================
+# ===========================================================================
 global display
 
 
@@ -71,17 +74,19 @@ class singleton(object):
 class Display(object):
     def __init__(self):
         self.display, self.start_display, self.add_menu, self.add_function_to_menu = init_display()
-    
+
     def __call__(self, *args, **kwargs):
         return self.display.DisplayShape(*args, **kwargs)
 
-#============
+
+# ============
 # base class
-#============
+# ============
 
 
 class KbeObject(object):
     """base class for all KBE objects"""
+
     def __init__(self, name=None):
         """Constructor for KbeObject"""
         self.GlobalProperties = GlobalProperties(self)
@@ -180,13 +185,14 @@ class KbeObject(object):
         return self.IsEqual(other)
 
     def __ne__(self, other):
-        return not(self.__eq__(other))
+        return not (self.__eq__(other))
 
 
 class GlobalProperties(object):
     '''
     global properties for all topologies
     '''
+
     def __init__(self, instance):
         self.instance = instance
 

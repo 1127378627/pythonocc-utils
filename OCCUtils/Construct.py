@@ -26,20 +26,25 @@ from functools import wraps
 import warnings
 
 from OCC.BRep import BRep_Tool
+from OCC.BRepBuilderAPI import BRepBuilderAPI_MakeSolid, BRepBuilderAPI_MakeShell, BRepBuilderAPI_MakeFace, \
+    BRepBuilderAPI_MakeEdge2d, BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeVertex, BRepBuilderAPI_MakeWire, \
+    BRepBuilderAPI_MakePolygon, BRepBuilderAPI_Sewing, BRepBuilderAPI_Transform, BRepBuilderAPI_FindPlane
 from OCC.BRepOffset import BRepOffset_Skin
+from OCC.BRepPrimAPI import BRepPrimAPI_MakePrism, BRepPrimAPI_MakeBox
 from OCC.Geom import Geom_TrimmedCurve
+from OCC.GeomAbs import GeomAbs_Arc, GeomAbs_Tangent, GeomAbs_Intersection, GeomAbs_C2, GeomAbs_C0, GeomAbs_C1
 from OCC.GeomConvert import GeomConvert_ApproxCurve
-from OCC.GeomLProp import *
-from OCC.BRepBuilderAPI import *
-from OCC.BRepPrimAPI import *
 from OCC.BRepOffsetAPI import BRepOffsetAPI_MakeEvolved
-from OCC.GeomAbs import *
-from OCC.TopAbs import *
-from OCC.TopoDS import *
-from OCC.gp import *
+from OCC.GeomLProp import GeomLProp_SLProps
+from OCC.TColgp import TColgp_SequenceOfVec, TColgp_HArray1OfPnt
+from OCC.TopAbs import TopAbs_REVERSED
+from OCC.TopoDS import TopoDS_Wire, TopoDS_Shape, TopoDS_Builder, TopoDS_Compound
+from OCC.TopoDS import TopoDS_Vertex
+from OCC.gp import gp_Vec, gp_Dir, gp_Ax1, gp_Trsf, gp_Quaternion, gp_Circ, gp_Pln
+from OCC.gp import gp_Pnt
 
-from Common import *
 from Context import assert_isdone
+from OCCUtils.Common import to_adaptor_3d, project_point_on_curve, vertex2pnt, to_tcol_, points_to_bspline
 from types_lut import ShapeToTopology
 
 import operator

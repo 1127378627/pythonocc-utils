@@ -15,25 +15,24 @@
 ##You should have received a copy of the GNU Lesser General Public License
 ##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>
 
+from OCC.BRep import BRep_Tool, BRep_Tool_Continuity
 from OCC.BRepAdaptor import BRepAdaptor_Curve, BRepAdaptor_HCurve
 from OCC.GCPnts import GCPnts_UniformAbscissa
 from OCC.Geom import Geom_OffsetCurve, Geom_TrimmedCurve
 from OCC.TopExp import topexp
 from OCC.TopoDS import TopoDS_Edge, TopoDS_Vertex, TopoDS_Face
-from OCC.gp import *
 from OCC.GeomLProp import GeomLProp_CurveTool
 from OCC.BRepLProp import BRepLProp_CLProps
 from OCC.GeomLib import geomlib
 from OCC.GCPnts import GCPnts_AbscissaPoint
 from OCC.GeomAPI import GeomAPI_ProjectPointOnCurve
 from OCC.ShapeAnalysis import ShapeAnalysis_Edge
-from OCC.BRep import *
+from OCC.gp import gp_Pnt, gp_Dir, gp_Vec
 
 # high-level
 from Common import vertex2pnt, minimum_distance
 from Construct import make_edge, fix_continuity
 from Context import assert_isdone
-from vertex import Vertex
 from types_lut import geom_lut
 from base import KbeObject
 
@@ -126,9 +125,10 @@ class DiffGeomCurve(object):
     def points_from_tangential_deflection(self):
         pass
 
-#===========================================================================
+
+# ===========================================================================
 #    Curve.Construct
-#===========================================================================
+# ===========================================================================
 
 
 class ConstructFromCurve():
@@ -176,7 +176,7 @@ class Edge(KbeObject, TopoDS_Edge):
         self.DiffGeom = DiffGeomCurve(self)
         self.Intersect = IntersectCurve(self)
         self.Construct = ConstructFromCurve(self)
-        #self.graphic   = GraphicCurve(self)
+        # self.graphic   = GraphicCurve(self)
 
         # GeomLProp object
         self._curvature = None
@@ -213,7 +213,7 @@ class Edge(KbeObject, TopoDS_Edge):
         if self._curve is not None and not self.is_dirty:
             pass
         else:
-            self._curve_handle = BRep_Tool().Curve(self)[0]
+            self._curve_handle = BRep_Tool.Curve(self)[0]
             self._curve = self._curve_handle.GetObject()
         return self._curve
 
@@ -279,9 +279,10 @@ class Edge(KbeObject, TopoDS_Edge):
         '''
         raise NotImplementedError
 
-#===========================================================================
-#    Curve.GlobalProperties
-#===========================================================================
+        # ===========================================================================
+
+    #    Curve.GlobalProperties
+    # ===========================================================================
 
     def length(self, lbound=None, ubound=None, tolerance=1e-5):
         '''returns the curve length
@@ -290,17 +291,20 @@ class Edge(KbeObject, TopoDS_Edge):
         '''
         _min, _max = self.domain()
         if _min < self.adaptor.FirstParameter():
-            raise ValueError('the lbound argument is lower than the first parameter of the curve: %s ' % (self.adaptor.FirstParameter()))
+            raise ValueError('the lbound argument is lower than the first parameter of the curve: %s ' % (
+            self.adaptor.FirstParameter()))
         if _max > self.adaptor.LastParameter():
-            raise ValueError('the ubound argument is greater than the last parameter of the curve: %s ' % (self.adaptor.LastParameter()))
+            raise ValueError('the ubound argument is greater than the last parameter of the curve: %s ' % (
+            self.adaptor.LastParameter()))
 
         lbound = _min if lbound is None else lbound
         ubound = _max if ubound is None else ubound
         return GCPnts_AbscissaPoint().Length(self.adaptor, lbound, ubound, tolerance)
 
-#===========================================================================
-#    Curve.modify
-#===========================================================================
+        # ===========================================================================
+
+    #    Curve.modify
+    # ===========================================================================
 
     def trim(self, lbound, ubound, periodic=False):
         '''
@@ -324,9 +328,10 @@ class Edge(KbeObject, TopoDS_Edge):
             raise ValueError('to extend you self.curve should be <= 3, is %s' % (self.degree))
         return geomlib.ExtendCurveToPoint(self.curve, pnt, degree, beginning)
 
-#===========================================================================
-#    Curve.
-#===========================================================================
+        # ===========================================================================
+
+    #    Curve.
+    # ===========================================================================
     def closest(self, other):
         return minimum_distance(self, other)
 
@@ -354,7 +359,7 @@ class Edge(KbeObject, TopoDS_Edge):
         its corresponding gp_Pnt
         """
         _min, _max = self.domain()
-        _mid = (_min+_max) / 2.
+        _mid = (_min + _max) / 2.
         return _mid, self.adaptor.Value(_mid)
 
     def divide_by_number_of_points(self, n_pts, lbound=None, ubound=None):
@@ -378,7 +383,7 @@ class Edge(KbeObject, TopoDS_Edge):
             print "Warning : GCPnts_UniformAbscissa failed"
         if npts.IsDone():
             tmp = []
-            for i in xrange(1, npts.NbPoints()+1):
+            for i in xrange(1, npts.NbPoints() + 1):
                 param = npts.Parameter(i)
                 pnt = self.adaptor.Value(param)
                 tmp.append((param, pnt))
@@ -390,17 +395,17 @@ class Edge(KbeObject, TopoDS_Edge):
     def weight(self, indx):
         '''descriptor sets or gets the weight of a control point at the index
         '''
-        #TODO self.curve has to be generalized to a bspline for this...
+        # TODO self.curve has to be generalized to a bspline for this...
         raise NotImplementedError
 
     def control_pt_coord(self, indx):
-        #TODO confused; vertices != control points
+        # TODO confused; vertices != control points
         '''descriptor setting or getting the coordinate of a
         control point at indx'''
         raise NotImplementedError
 
     def greville_points(self):
-        #TODO confused; vertices != greville points
+        # TODO confused; vertices != greville points
         '''descriptor setting or getting the coordinate
         of a control point at indx'''
         raise NotImplementedError
@@ -417,7 +422,7 @@ class Edge(KbeObject, TopoDS_Edge):
             return self.IsEqual(other)
 
     def __ne__(self, other):
-        return not(self.__eq__(other))
+        return not (self.__eq__(other))
 
     def first_vertex(self):
         # TODO: should return Vertex, not TopoDS_Vertex
@@ -440,9 +445,9 @@ class Edge(KbeObject, TopoDS_Edge):
         else:
             raise ValueError("edge is not a line, hence no meaningful vector can be returned")
 
-#===========================================================================
-#    Curve.
-#===========================================================================
+            # ===========================================================================
+        #    Curve.
+        # ===========================================================================
 
     def parameter_to_point(self, u):
         '''returns the coordinate at parameter u
@@ -474,9 +479,10 @@ class Edge(KbeObject, TopoDS_Edge):
     def continuity_from_faces(self, f1, f2):
         return BRep_Tool_Continuity(self, f1, f2)
 
-#===========================================================================
-#    Curve.loop
-#===========================================================================
+        # ===========================================================================
+
+    #    Curve.loop
+    # ===========================================================================
 
     def iter_control_points(self):
         '''iterator over the control points
@@ -488,9 +494,10 @@ class Edge(KbeObject, TopoDS_Edge):
         '''
         raise NotImplementedError
 
-#===========================================================================
-#    Curve.
-#===========================================================================
+        # ===========================================================================
+
+    #    Curve.
+    # ===========================================================================
     def is_trimmed(self):
         '''checks if curve is trimmed
 
@@ -525,9 +532,10 @@ class Edge(KbeObject, TopoDS_Edge):
         '''
         raise NotImplementedError
 
-#===========================================================================
-#    Curve.graphic
-#===========================================================================
+        # ===========================================================================
+
+    #    Curve.graphic
+    # ===========================================================================
     def show(self, poles=False, vertices=False, knots=False):
         '''
         poles, knots, should render all slightly different.
