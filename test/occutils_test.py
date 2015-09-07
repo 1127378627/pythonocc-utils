@@ -23,6 +23,11 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCC.TopoDS import TopoDS_Face, TopoDS_Shape, TopoDS_Solid
 
 from OCCUtils.Topology import Topo
+from OCCUtils.edge import Edge
+from OCCUtils.wire import Wire
+from OCCUtils.face import Face
+from OCCUtils.shell import Shell
+
 
 
 def get_test_box_shape():
@@ -122,6 +127,37 @@ class Test_TypesLut(unittest.TestCase):
 
         for i in tp.shells():
             assert stt(TopoDS_Shape(i)) == i
+
+
+class Test_KBE_types(unittest.TestCase):
+
+    """
+
+    inheriting from TopoDS_* classes is pretty complex
+    this test just creates instances, merely creating the instances validates whether the
+    constructors of the KBE types are alright
+
+    """
+
+    def setUp(self):
+        self.box = get_test_box_shape()
+        self.tp = Topo(self.box)
+
+    def test_instantiate_edge(self):
+        for i in self.tp.edges():
+            assert Edge(i)
+
+    def test_instantiate_face(self):
+        for i in self.tp.faces():
+            assert Face(i)
+
+    def test_instantiate_wire(self):
+        for i in self.tp.wires():
+            assert Wire(i)
+
+    def test_instantiate_shell(self):
+        for i in self.tp.shells():
+            assert Shell(i)
 
 
 

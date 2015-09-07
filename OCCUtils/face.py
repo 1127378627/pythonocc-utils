@@ -180,7 +180,7 @@ class DiffGeomSurface(object):
         raise NotImplementedError
 
 
-class Face(KbeObject, TopoDS_Face):
+class Face(TopoDS_Face, KbeObject):
     """high level surface API
     object is a Face if part of a Solid
     otherwise the same methods do apply, apart from the topology obviously

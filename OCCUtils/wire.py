@@ -22,7 +22,7 @@ from OCC.TopoDS import TopoDS_Wire
 from OCCUtils.base import KbeObject
 
 
-class Wire(KbeObject, TopoDS_Wire):
+class Wire(TopoDS_Wire, KbeObject):
     def __init__(self, wire):
         '''
         '''

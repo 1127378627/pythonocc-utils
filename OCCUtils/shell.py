@@ -51,7 +51,7 @@ class DressUp(object):
         pass
 
 
-class Shell(KbeObject, TopoDS_Shell):
+class Shell(TopoDS_Shell, KbeObject):
     _n = 0
 
     def __init__(self, shell):

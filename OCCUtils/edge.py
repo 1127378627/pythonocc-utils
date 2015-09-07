@@ -154,7 +154,7 @@ class ConstructFromCurve():
         raise NotImplementedError
 
 
-class Edge(KbeObject, TopoDS_Edge):
+class Edge(TopoDS_Edge, KbeObject):
     def __init__(self, edge):
         assert isinstance(edge, TopoDS_Edge), 'need a TopoDS_Edge, got a %s' % edge.__class__
 
