@@ -26,8 +26,13 @@ class Solid(KbeObject, TopoDS_Solid):
 
     """high level Solid Api"""
     def __init__(self, solid):
-        KbeObject.__init__(name='solid')
-        TopoDS_Solid.__init__(self, solid)
+
+        super(Solid, self).__init__()
+        self.TShape(solid.TShape())
+        self.Location(solid.Location())
+        self.Orientation(solid.Orientation())
+        KbeObject.__init__(self, name='solid')
+
         self.GlobalProperties = GlobalProperties(self)
 
     #=======================================================================

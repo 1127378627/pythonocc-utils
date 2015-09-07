@@ -27,5 +27,8 @@ class Wire(KbeObject, TopoDS_Wire):
         '''
         '''
         assert isinstance(wire, TopoDS_Wire), 'need a TopoDS_Wire, got a %s' % wire.__class__
-        KbeObject.__init__(self, 'wire')
-        TopoDS_Wire.__init__(self, wire)
+        super(Wire, self).__init__()
+        self.TShape(wire.TShape())
+        self.Location(wire.Location())
+        self.Orientation(wire.Orientation())
+        KbeObject.__init__(self, name='wire')

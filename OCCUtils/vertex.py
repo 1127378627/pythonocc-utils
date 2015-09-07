@@ -38,6 +38,15 @@ class Vertex(KbeObject, TopoDS_Vertex):
         self._vertex = make_vertex(self._pnt)
         TopoDS_Vertex.__init__(self, self._vertex)
 
+
+        # KbeObject.__init__(self, name='vertex')
+        # self.TShape(shell.TShape())
+        # self.Location(shell.Location())
+        # self.Orientation(shell.Orientation())
+        # super(Shell, self).__init__()
+
+
+
     def _update(self):
         """
 

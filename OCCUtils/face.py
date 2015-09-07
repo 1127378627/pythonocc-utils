@@ -189,12 +189,14 @@ class Face(KbeObject, TopoDS_Face):
     def __init__(self, face):
         '''
         '''
-        KbeObject.__init__(self, name='face')
+
+
         # TopoDS_Face inheritance
-        TopoDS_Face.__init__(self)
+        super(Face, self).__init__()
         self.TShape(face.TShape())
         self.Location(face.Location())
         self.Orientation(face.Orientation())
+        KbeObject.__init__(self, name='face')
 
         # cooperative classes
         self.DiffGeom = DiffGeomSurface(self)

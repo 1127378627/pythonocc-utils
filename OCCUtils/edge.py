@@ -157,8 +157,13 @@ class ConstructFromCurve():
 class Edge(KbeObject, TopoDS_Edge):
     def __init__(self, edge):
         assert isinstance(edge, TopoDS_Edge), 'need a TopoDS_Edge, got a %s' % edge.__class__
-        KbeObject.__init__(self, 'edge')
-        TopoDS_Edge.__init__(self, edge)
+
+        super(Edge, self).__init__()
+        self.TShape(edge.TShape())
+        self.Location(edge.Location())
+        self.Orientation(edge.Orientation())
+        KbeObject.__init__(self, name='edge')
+
 
         # tracking state
         self._local_properties_init = False
