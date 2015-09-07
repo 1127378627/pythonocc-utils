@@ -18,14 +18,11 @@
 ##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-import sys
-
-sys.path.append('../OCCUtils')
 
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCC.TopoDS import TopoDS_Face, TopoDS_Shape, TopoDS_Solid
 
-from Topology import Topo
+from OCCUtils.Topology import Topo
 
 
 def get_test_box_shape():
@@ -33,14 +30,16 @@ def get_test_box_shape():
 
 
 class TestTopo(unittest.TestCase):
+
+    def setUp(self):
+        self.box = get_test_box_shape()
+
     def test_init(self):
-        b = get_test_box_shape()
-        t = Topo(b)
+        t = Topo(self.box)
         assert(t)
 
     def test_loop_faces(self):
-        b = get_test_box_shape()
-        t = Topo(b)
+        t = Topo(self.box)
         i = 0
         for face in t.faces():
             i += 1
@@ -48,8 +47,7 @@ class TestTopo(unittest.TestCase):
         assert(i == 6)
 
     def test_get_numbers_of_members(self):
-        b = get_test_box_shape()
-        t = Topo(b)
+        t = Topo(self.box)
         assert(t.number_of_faces() == 6)
         assert(t.number_of_edges() == 12)
         assert(t.number_of_vertices() == 8)
@@ -58,6 +56,22 @@ class TestTopo(unittest.TestCase):
         assert(t.number_of_shells() == 1)
         assert(t.number_of_compounds() == 0)
         assert(t.number_of_comp_solids() == 0)
+
+    def test_ignore_orientation(self):
+        t = Topo(self.box, ignore_orientation=False)
+        t_ignore = Topo(self.box, ignore_orientation=True)
+
+        print "no ignore", len([e for e in t.edges()]) # expect 24
+        print "ignore", len([e for e in t_ignore.edges()]) # expect 12
+        print "OMG"
+
+    # def test_kbe_wires(self):
+    #     t = Topo(self.box, kbe_types=True)
+    #     edges = [e for e in t.edges()]
+    #     print "mmm"
+
+
+
 
 # TODO: port the huge list of tests from the ancient pythonocc repo...
 

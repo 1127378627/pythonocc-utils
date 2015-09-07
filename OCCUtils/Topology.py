@@ -27,9 +27,11 @@ History:
         23-04-2009:    fixed a reference issue ( fixed using ReInit )
 '''
 from __future__ import print_function
+
 from OCC.BRep import BRep_Tool
 from OCC.BRepTools import BRepTools_WireExplorer
-from OCC.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_WIRE, TopAbs_SHELL, TopAbs_SOLID, TopAbs_COMPOUND, \
+from OCC.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_WIRE, TopAbs_SHELL, TopAbs_SOLID, \
+    TopAbs_COMPOUND, \
     TopAbs_COMPSOLID
 from OCC.TopExp import TopExp_Explorer, topexp_MapShapesAndAncestors
 from OCC.TopTools import TopTools_ListOfShape, TopTools_IndexedDataMapOfShapeListOfShape
@@ -37,14 +39,17 @@ from OCC.TopTools import TopTools_ListIteratorOfListOfShape
 from OCC.TopoDS import TopoDS_Wire, topods_Edge, topods_Vertex, topods_Face, topods_Wire, topods_Shell, topods_Solid, \
     topods_Compound, topods_CompSolid, TopoDS_Iterator
 
+from OCCUtils.edge import Edge
+
 __all__ = ['Topo', 'WireExplorer']
 
 
 class WireExplorer(object):
     '''   '''
 
-    def __init__(self, wire):
+    def __init__(self, wire, kbe_types=False):
         assert isinstance(wire, TopoDS_Wire), 'not a TopoDS_Wire'
+        self.kbe_types = kbe_types
         self.wire = wire
         self.wire_explorer = BRepTools_WireExplorer(self.wire)
         self.done = False
@@ -77,7 +82,11 @@ class WireExplorer(object):
         occ_iterator = TopTools_ListIteratorOfListOfShape(occ_seq)
         while occ_iterator.More():
             topo_to_add = topologyType(occ_iterator.Value())
-            seq.append(topo_to_add)
+            if self.kbe_types and edges:
+                edge = Edge(topo_to_add)
+                seq.append(edge)
+            else:
+                seq.append(topo_to_add)
             occ_iterator.Next()
         self.done = True
         return iter(seq)
@@ -91,13 +100,67 @@ class WireExplorer(object):
 
 class Topo(object):
     '''
-    sketch for a pythonic topology wrapper
-    note that `myShape` should be self, which is in return a occ.TopoShape
-    with this
+    Topology traversal
     '''
 
-    def __init__(self, myShape):
+    def __init__(self, myShape, kbe_types=False, ignore_orientation=False):
+        """
+
+        implements topology traversal from any TopoDS_Shape
+        this class lets you find how various topological entities are connected from one to another
+        find the faces connected to an edge, find the vertices this edge is made from, get all faces connected to
+        a vertex, and find out how many topological elements are connected from a source
+
+        *note* when traversing TopoDS_Wire entities, its advised to use the specialized
+        ``WireExplorer`` class, which will return the vertices / edges in the expected order
+
+        :param myShape: the shape which topology will be traversed
+
+        :param kbe_types: whether to return OCC.KBE topology types
+        KBE types offers a more consistent and pythonic API, since many useful
+        methods are bound to these objects
+
+        :param ignore_orientation: filter out TopoDS_* entities of similar TShape but different Orientation
+
+        for instance, a cube has 24 edges, 4 edges for each of 6 faces
+
+        that results in 48 vertices, while there are only 8 vertices that have a unique
+        geometric coordinate
+
+        in certain cases ( computing a graph from the topology ) its preferable to return
+        topological entities that share similar geometry, though differ in orientation
+        by setting the ``ignore_orientation`` variable
+        to True, in case of a cube, just 12 edges and only 8 vertices will be returned
+
+        for further reference see TopoDS_Shape IsEqual / IsSame methods
+
+        """
         self.myShape = myShape
+        self.kbe_types = kbe_types
+        self.ignore_orientation = ignore_orientation
+
+        self.topoTypes = {TopAbs_VERTEX: topods_Vertex,
+                          TopAbs_EDGE: topods_Edge,
+                          TopAbs_FACE: topods_Face,
+                          TopAbs_WIRE: topods_Wire,
+                          TopAbs_SHELL: topods_Shell,
+                          TopAbs_SOLID: topods_Solid,
+                          TopAbs_COMPOUND: topods_Compound,
+                          TopAbs_COMPSOLID: topods_CompSolid}
+
+        if self.kbe_types:
+            from OCCUtils.vertex import Vertex
+            from OCCUtils.edge import Edge
+            from OCCUtils.face import Face
+            from OCCUtils.solid import Shell, Solid
+
+            self.kbeTypes = {
+                TopAbs_VERTEX: Vertex,
+                TopAbs_EDGE: Edge,
+                TopAbs_FACE: Face,
+                TopAbs_SHELL: Shell,
+                TopAbs_SOLID: Solid,
+            }
 
     def _loop_topo(self, topologyType, topologicalEntity=None, topologyTypeToAvoid=None):
         '''
@@ -106,15 +169,7 @@ class Topo(object):
         for face in srf.faces:
             processFace(face)
         '''
-        topoTypes = {TopAbs_VERTEX: topods_Vertex,
-                     TopAbs_EDGE: topods_Edge,
-                     TopAbs_FACE: topods_Face,
-                     TopAbs_WIRE: topods_Wire,
-                     TopAbs_SHELL: topods_Shell,
-                     TopAbs_SOLID: topods_Solid,
-                     TopAbs_COMPOUND: topods_Compound,
-                     TopAbs_COMPSOLID: topods_CompSolid}
-        assert topologyType in topoTypes.keys(), '%s not one of %s' % (topologyType, topoTypes.keys())
+        assert topologyType in self.topoTypes.keys(), '%s not one of %s' % (topologyType, self.topoTypes.keys())
         self.topExp = TopExp_Explorer()
         # use self.myShape if nothing is specified
         if topologicalEntity is None and topologyTypeToAvoid is None:
@@ -138,15 +193,37 @@ class Topo(object):
         # Convert occ_seq to python list
         occ_iterator = TopTools_ListIteratorOfListOfShape(occ_seq)
         while occ_iterator.More():
-            topo_to_add = topoTypes[topologyType](occ_iterator.Value())
-            seq.append(topo_to_add)
+            topo_to_add = self.topoTypes[topologyType](occ_iterator.Value())
+            # return a KBE type
+            if self.kbe_types:
+                if topologyType in self.kbeTypes:
+                    seq.append(self.kbeTypes[topologyType](topo_to_add))
+
+            # otherwise a plain TopoDS_Shape subclass
+            else:
+                seq.append(topo_to_add)
             occ_iterator.Next()
-        return iter(seq)
+
+        if self.ignore_orientation:
+            # filter out those entities that share the same TShape
+            # but do *not* share the same orientation
+            filter_orientation_seq = []
+            for i in seq:
+                _present = False
+                for j in filter_orientation_seq:
+                    if i.IsSame(j):
+                        _present = True
+                        break
+                if _present is False:
+                    filter_orientation_seq.append(i)
+            return filter_orientation_seq
+        else:
+            return iter(seq)
 
     def faces(self):
-        '''
+        """
         loops over all faces
-        '''
+        """
         return self._loop_topo(TopAbs_FACE)
 
     def _number_of_topo(self, iterable):
@@ -254,21 +331,31 @@ class Topo(object):
         results = _map.FindFromKey(topologicalEntity)
         if results.IsEmpty():
             yield None
-        topoTypes = {TopAbs_VERTEX: topods_Vertex,
-                     TopAbs_EDGE: topods_Edge,
-                     TopAbs_FACE: topods_Face,
-                     TopAbs_WIRE: topods_Wire,
-                     TopAbs_SHELL: topods_Shell,
-                     TopAbs_SOLID: topods_Solid,
-                     TopAbs_COMPOUND: topods_Compound,
-                     TopAbs_COMPSOLID: topods_CompSolid}
+
         topology_iterator = TopTools_ListIteratorOfListOfShape(results)
         while topology_iterator.More():
-            topo_entity = topoTypes[topoTypeB](topology_iterator.Value())
+
+            topo_entity  = self.topoTypes[topoTypeB](topology_iterator.Value())
+            if self.kbe_types:
+                if topoTypeB in self.kbeTypes:
+                    topo_entity = self.kbeTypes[topoTypeB](topo_entity)
+                else:
+                    raise ValueError('none KBE types called')
+
             # return the entity if not in set
             # to assure we're not returning entities several times
             if not topo_entity in topo_set:
-                yield topo_entity
+                if self.ignore_orientation:
+                    unique=True
+                    for i in topo_set:
+                        if i.IsSame(topo_entity):
+                            unique=False
+                            break
+                    if unique:
+                        yield topo_entity
+                else:
+                    yield topo_entity
+
             topo_set.add(topo_entity)
             topology_iterator.Next()
 
