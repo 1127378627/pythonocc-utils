@@ -94,13 +94,14 @@ def gp_Pnt_equal(self, other):
 
 
 def gp_pnt_print(self):
-    return '< gp_Pnt: {0}, {1}, {2} >'.format(self.X(), self.Y(), self.Z())
+    x, y, z = self.X(), self.Y(), self.Z()
+    return '< gp_Pnt: {}, {}, {} >'.format(x,y,z)
 
 
 def gp_vec_print(self):
-    x, y, z = self.Coord()
+    x, y, z = self.X(), self.Y(), self.Z()
     magn = self.Magnitude()
-    return '< gp_Vec: {0}, {1}, {2}, magnitude: {3} >'.format(x, y, z, magn)
+    return '< gp_Vec: {}, {}, {}, magnitude: {} >'.format(x,y,z,magn)
 
 
 def gp_ax1_print(self):
