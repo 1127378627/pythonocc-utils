@@ -430,10 +430,10 @@ class Edge(TopoDS_Edge, KbeObject):
 
     def first_vertex(self):
         # TODO: should return Vertex, not TopoDS_Vertex
-        return topexp.FirstVertex(self)
+        return topexp.FirstVertex(self, True)
 
     def last_vertex(self):
-        return topexp.LastVertex(self)
+        return topexp.LastVertex(self, True)
 
     def common_vertex(self, edge):
         vert = TopoDS_Vertex()

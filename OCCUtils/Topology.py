@@ -103,7 +103,7 @@ class Topo(object):
     Topology traversal
     '''
 
-    def __init__(self, myShape, kbe_types=False, ignore_orientation=False):
+    def __init__(self, myShape, return_iter=True, kbe_types=False, ignore_orientation=False):
         """
 
         implements topology traversal from any TopoDS_Shape
@@ -138,6 +138,7 @@ class Topo(object):
         self.myShape = myShape
         self.kbe_types = kbe_types
         self.ignore_orientation = ignore_orientation
+        self.return_iter = return_iter
 
         self.topoTypes = {TopAbs_VERTEX: topods_Vertex,
                           TopAbs_EDGE: topods_Edge,
@@ -218,7 +219,10 @@ class Topo(object):
                     filter_orientation_seq.append(i)
             return filter_orientation_seq
         else:
-            return iter(seq)
+            if self.return_iter:
+                return iter(seq)
+            else:
+                return seq
 
     def faces(self):
         """
