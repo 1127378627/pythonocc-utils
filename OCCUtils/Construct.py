@@ -94,7 +94,7 @@ def gp_Pnt_equal(self, other):
 
 
 def gp_pnt_print(self):
-    return '< gp_Pnt: {0}, {1}, {2} >'.format(*self.Coord())
+    return '< gp_Pnt: {0}, {1}, {2} >'.format(self.X(), self.Y(), self.Z())
 
 
 def gp_vec_print(self):
@@ -119,9 +119,7 @@ def gp_trsf_print(self):
 
 def gp_quat_print(self):
     w, x, y, z = self.W(), self.X(), self.Y(), self.Z()
-    vec = gp_Vec()
-    angle = math.degrees(self.GetVectorAndAngle(vec))
-    return "< gp_Quaternion: w:{w}, x:{x}, y:{y}, z:{z} >\nvector:{vec} angle:{angle}".format(**vars())
+    return "< gp_Quaternion: w:{w}, x:{x}, y:{y}, z:{z}".format(**vars())
 
 
 def _apply(pnt, other, _operator):
