@@ -26,7 +26,7 @@ from OCC.BRepGProp import brepgprop_LinearProperties, brepgprop_SurfacePropertie
 from OCC import Graphic3d
 from OCC.Bnd import Bnd_Box
 from OCC.GProp import GProp_GProps
-from OCC.GeomAPI import GeomAPI_PointsToBSpline, GeomAPI_Interpolate
+from OCC.GeomAPI import GeomAPI_PointsToBSpline, GeomAPI_Interpolate, GeomAPI_IntCS
 from OCC.GeomAbs import GeomAbs_C2
 from OCC.Quantity import Quantity_Color, Quantity_TOC_RGB
 from OCC.TColStd import TColStd_HArray1OfBoolean
@@ -54,7 +54,7 @@ def roundlist(li, n_decimals=3):
 TOLERANCE = 1e-6
 
 
-def get_boundingbox(shape, tol=TOLERANCE, vec=False):
+def get_boundingbox(shape, as_vec=False, as_bnd_box=False, tol=TOLERANCE):
     '''
     :param shape: TopoDS_Shape such as TopoDS_Face
     :param tol: tolerance
@@ -62,13 +62,15 @@ def get_boundingbox(shape, tol=TOLERANCE, vec=False):
     '''
     bbox = Bnd_Box()
     bbox.SetGap(tol)
-    #BRepBndLib_AddClose(shape, bbox)
     tmp = brepbndlib_Add(shape, bbox)
     xmin, ymin, zmin, xmax, ymax, zmax = bbox.Get()
-    if vec is False:
-        return xmin, ymin, zmin, xmax, ymax, zmax
-    else:
+
+    if as_vec:
         return gp_Vec(xmin, ymin, zmin), gp_Vec(xmax, ymax, zmax)
+    elif as_bnd_box:
+        return bbox
+    else:
+        return xmin, ymin, zmin, xmax, ymax, zmax
 
 
 def smooth_pnts(pnts):
@@ -323,7 +325,7 @@ def point_in_solid(solid, pnt, tolerance=1e-5):
     from OCC.BRepClass3d import BRepClass3d_SolidClassifier
     from OCC.TopAbs import TopAbs_ON, TopAbs_OUT, TopAbs_IN
     _in_solid = BRepClass3d_SolidClassifier(solid, pnt, tolerance)
-    print 'STATE', _in_solid.State()
+    print '>>STATE>>', _in_solid.State()
     if _in_solid.State() == TopAbs_ON:
         return None, 'on'
     if _in_solid.State() == TopAbs_OUT:
@@ -350,6 +352,38 @@ def intersection_from_three_planes(planeA, planeB, planeC):
     intersection_planes = IntAna_Int3Pln(planeA, planeB, planeC)
     pnt = intersection_planes.Value()
     return pnt
+
+
+def intersect_plane_line(pln, li):
+
+    """
+    :param pln: gp_Pln or Geom_Plane
+    :param li: gp_Lin
+    """
+
+    from OCC.Geom import Geom_Plane, Geom_Line
+    _li = Geom_Line(li)
+
+    if isinstance(pln, gp_Pln):
+        _pln = Geom_Plane(pln)
+    elif isinstance(pln, Geom_Plane):
+        _pln = pln
+    else:
+        raise ValueError("the `pln` argument either is a gp_Pln or a Geom_Plane, but a {0}\
+         argument was supplied".format(pln.__class__))
+
+    intersect_ = GeomAPI_IntCS()
+    intersect_.Perform(_li.GetHandle(), _pln.GetHandle())
+    if intersect_.IsDone():
+        if intersect_.NbPoints() == 0:
+            return  None
+        elif intersect_.NbPoints() ==1:
+            return intersect_.Point(1)
+        else:
+            raise ValueError("found more than one intersection of a line and a plane...\
+             expected just a single intersection")
+    else:
+        return None
 
 
 def intersect_shape_by_line(topods_shape, line, low_parameter=0.0, hi_parameter=float("+inf")):
