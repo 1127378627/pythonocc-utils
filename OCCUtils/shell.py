@@ -82,13 +82,13 @@ class Shell(TopoDS_Shell, KbeObject):
 
         :return:
         """
-        return Topo(self, True).faces()
+        return Topo(self, kbe_types=True).faces()
 
     def Wires(self):
         """
         :return:
         """
-        return Topo(self, True).wires()
+        return Topo(self, kbe_types=True).wires()
 
     def Edges(self):
-        return Topo(self, True).edges()
+        return Topo(self, kbe_types=True).edges()
