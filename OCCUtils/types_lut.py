@@ -20,8 +20,6 @@ from OCC.Core.GeomAbs import *
 from OCC.Core.TopoDS import topods, TopoDS_Shape
 from OCC.Core.BRep import BRep_Tool_Surface
 from OCC.Core.TopAbs import *
-from OCC.Core.Geom import Handle_Geom_CylindricalSurface, Handle_Geom_Plane
-
 
 class ShapeToTopology(object):
     '''
@@ -170,7 +168,7 @@ def what_is_face(face):
         print('%s is not a TopAbs_FACE. Conversion impossible')
         return None
     hs = BRep_Tool_Surface(face)
-    obj = hs.GetObject()
+    obj = hs
     result = []
     for elem in classes:
         if (elem.startswith('Geom') and not 'swig' in elem):
