@@ -197,7 +197,6 @@ def make_solid(*args):
     sld = BRepBuilderAPI_MakeSolid(*args)
     with assert_isdone(sld, 'failed to produce solid'):
         result = sld.Solid()
-        sld.Delete()
         return result
 
 
@@ -207,7 +206,6 @@ def make_shell(*args):
     st = ShapeToTopology()
     with assert_isdone(shell, 'failed to produce shell'):
         result = shell.Shell()
-        shell.Delete()
         return st(result)
 
 
@@ -216,7 +214,6 @@ def make_face(*args):
     face = BRepBuilderAPI_MakeFace(*args)
     with assert_isdone(face, 'failed to produce face'):
         result = face.Face()
-        face.Delete()
         return result
 
 
@@ -225,7 +222,6 @@ def make_edge2d(*args):
     edge = BRepBuilderAPI_MakeEdge2d(*args)
     with assert_isdone(edge, 'failed to produce edge'):
         result = edge.Edge()
-        edge.Delete()
     return result
 
 
@@ -234,7 +230,6 @@ def make_edge(*args):
     edge = BRepBuilderAPI_MakeEdge(*args)
     with assert_isdone(edge, 'failed to produce edge'):
         result = edge.Edge()
-        edge.Delete()
         return result
 
 
@@ -584,7 +579,6 @@ def add_wire_to_face(face, wire, reverse=False):
         wire.Reverse()
     face.Add(wire)
     result = face.Face()
-    face.Delete()
     return result
 
 
